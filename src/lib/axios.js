@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api', // ناونیشانی بنەڕەتی API
+    baseURL: 'https://enghama-55a3c7ea0ac1.herokuapp.com/api', // ناونیشانی بنەڕەتی API
 });
 
 // ئەم بەشە زۆر گرنگە: بە شێوەی ئۆتۆماتیکی تۆکنی JWT زیاد دەکات بۆ هەر داواکارییەک
