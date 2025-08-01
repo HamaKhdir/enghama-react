@@ -1,33 +1,29 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import apiClient from '../lib/axios'; // 1. apiClient لە فایلی ناوەندییەوە import دەکەین
 
 const AuthContext = createContext(null);
 
-// Axios instance to automatically add the auth header
-const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api'
-});
-
-apiClient.interceptors.request.use(config => {
-    const authTokens = localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null;
-    if (authTokens) {
-        config.headers.Authorization = `Bearer ${authTokens.access}`;
-    }
-    return config;
-});
-
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [authTokens, setAuthTokens] = useState(() => 
+        localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null
+    );
     const [loading, setLoading] = useState(true);
 
     const loginUser = async (email, password) => {
         try {
+            // 2. apiClient بەکاردەهێنین
             const response = await apiClient.post('/auth/login/', { email, password });
             const data = response.data;
+            
+            // 3. authTokens لە localStorage پاشەکەوت دەکەین
             localStorage.setItem('authTokens', JSON.stringify(data));
-            // دوای لۆگین، زانیاری تەواوی یوزەر وەردەگرین
-            await fetchCurrentUser(); 
+            setAuthTokens(data);
+
+            // 4. زانیاری بەکارهێنەر لە تۆکنە نوێیەکە وەردەگرین
+            const userResponse = await apiClient.get('/auth/user/');
+            setUser(userResponse.data);
+
             return { success: true };
         } catch (error) {
             return { success: false, error: 'Invalid email or password.' };
@@ -36,39 +32,36 @@ export const AuthProvider = ({ children }) => {
 
     const logoutUser = () => {
         localStorage.removeItem('authTokens');
+        setAuthTokens(null);
         setUser(null);
     };
 
-    const fetchCurrentUser = async () => {
-        const authTokens = localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null;
-        if (!authTokens) {
-            setLoading(false);
-            return;
-        }
-        try {
-            const response = await apiClient.get('/auth/user/');
-            setUser(response.data);
-        } catch (error) {
-            // ئەگەر تۆکنەکە هەڵە بوو
-            logoutUser();
-        } finally {
-            setLoading(false);
-        }
-    };
-    
     useEffect(() => {
-        fetchCurrentUser();
-    }, []);
+        const fetchUserOnLoad = async () => {
+            if (authTokens) {
+                try {
+                    // 5. apiClient بەکاردەهێنین
+                    const response = await apiClient.get('/auth/user/');
+                    setUser(response.data);
+                } catch {
+                    logoutUser(); // ئەگər تۆکنەکە هەڵە بوو
+                }
+            }
+            setLoading(false);
+        };
+        fetchUserOnLoad();
+    }, []); // تەنها یەکجار کاردەکات
 
     const contextData = {
         user,
+        authTokens,
         loginUser,
         logoutUser,
     };
 
     return (
         <AuthContext.Provider value={contextData}>
-            {loading ? <p>Loading...</p> : children}
+            {loading ? <p>Loading application...</p> : children}
         </AuthContext.Provider>
     );
 };
