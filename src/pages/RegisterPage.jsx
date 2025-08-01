@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import apiClient from '../lib/axios'; 
 import { useNavigate, Link } from 'react-router-dom';
 const AuthContainer = styled.div`
   max-width: 450px;
@@ -86,7 +86,7 @@ const RegisterPage = () => {
             return;
         }
         try {
-            await axios.post('http://127.0.0.1:8000/api/auth/register/', { // URLـەکە بگۆڕە
+            await apiClient.post('http://127.0.0.1:8000/api/auth/register/', { // URLـەکە بگۆڕە
                 email: formData.email,
                 password: formData.password,
                 password2: formData.password2,

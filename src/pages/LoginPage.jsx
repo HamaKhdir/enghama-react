@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, Link } from 'react-router-dom';
+import apiClient from '../lib/axios';
 import { FaGoogle, FaGithub, FaFacebook, FaTwitter } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext'; // Import useAuth hook
 
