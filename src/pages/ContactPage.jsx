@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import apiClient from '../lib/axios';
 import { device } from '../styles/breakpoints';
 
 const ContactContainer = styled.div`
@@ -89,7 +89,7 @@ const ContactPage = () => {
         setFormStatus({ message: '', type: '' }); // Clear previous status
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/core/contact/', formData);
+            const response = await apiClient.post('/core/contact/', formData);
             setFormStatus({ message: 'Message sent successfully!', type: 'success' });
             setFormData({ name: '', email: '', message: '' }); // Clear form
         } catch (error) {

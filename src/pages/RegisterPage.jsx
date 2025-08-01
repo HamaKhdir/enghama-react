@@ -86,11 +86,11 @@ const RegisterPage = () => {
             return;
         }
         try {
-            await apiClient.post('http://127.0.0.1:8000/api/auth/register/', { // URLـەکە بگۆڕە
-                email: formData.email,
-                password: formData.password,
-                password2: formData.password2,
-            });
+              await apiClient.post('/auth/register/', { // تەنها ناونیشانی ڕێژەیی بەکاربهێنە
+                  email: formData.email,
+                  password: formData.password,
+                  password2: formData.password2,
+              });
             navigate('/login');
         } catch (err) {
             const serverError = err.response?.data;
